@@ -13,6 +13,7 @@ from base64 import b64encode
 from .FCastSession import Event, FCastSession, PlayMessage, PlayBackUpdateMessage, PlayBackState, SeekMessage, SetVolumeMessage, VolumeUpdateMessage
 from .player import FCastPlayer
 from .util import log_and_notify, debounce
+from .discovery import advertise_fcast, unregister_fcast_discovery
 
 session_threads: List[Thread] = []
 sessions: List[FCastSession] = []
@@ -193,6 +194,7 @@ def main():
     selector = selectors.DefaultSelector()
     selector.register(s, selectors.EVENT_READ, data=None)
 
+    advertise_fcast()
     log_and_notify("Server listening on port %d" % FCAST_PORT, timeout=1000)
 
     monitor = xbmc.Monitor()
@@ -216,6 +218,7 @@ def main():
         if monitor.waitForAbort(0.250):
             break
 
+    unregister_fcast_discovery()
     s.close()
 
     log_and_notify("Server stopped")
